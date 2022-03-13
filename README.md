@@ -28,12 +28,11 @@
 - Executando o comando para enviar a mensagem "Olá, mundo" para o SQS:
             aws sqs send-message --queue-url https://sqs.sa-east-1.amazonaws.com/488929950883/alura-test --message-body "Olá, mundo"
 
-            Output:
 
-            {
-    "MD5OfMessageBody": "422b212378ba94b703961607191fbd49",
-    "MessageId": "565bd4ac-239d-419f-8007-fe9ce13cc521"
-}
+                    {
+            "MD5OfMessageBody": "422b212378ba94b703961607191fbd49",
+            "MessageId": "565bd4ac-239d-419f-8007-fe9ce13cc521"
+        }
 
 
 - Executando o comando para receber a mensagem do SQS: 
@@ -88,5 +87,5 @@
                 }
             ]
         }
-        
+
   - O que é o "ReceiptHandle"? é o controle de recebimento da mensagem
