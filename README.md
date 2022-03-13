@@ -10,17 +10,83 @@
     'aws help' pra ver se o AWS CLI está instaldo
     aws configure: 
 - Primeiros comandos SQS:
-    aws sqs help: lista de comandos do sqs
+    - aws sqs help: lista de comandos do sqs
 
-    aws sqs list-queues: lista de queues criadas
+    - aws sqs list-queues: lista de queues criadas
 
     Ex: 
     
-    {
-    "QueueUrls": [
-        "https://sqs.sa-east-1.amazonaws.com/488929950883/alura-test"
-    ]
+        {
+        "QueueUrls": [
+            "https://sqs.sa-east-1.amazonaws.com/488929950883/alura-test"
+        ]
+    }
+    - AWS sqs send-message help: entrega uma mensagem para uma fila específica
+        parâmetros obrigatórios:
+            --queue-url: url da fila
+            -- message-body: corpo da mensagem
+- Executando o comando para enviar a mensagem "Olá, mundo" para o SQS:
+            aws sqs send-message --queue-url https://sqs.sa-east-1.amazonaws.com/488929950883/alura-test --message-body "Olá, mundo"
+
+            Output:
+
+            {
+    "MD5OfMessageBody": "422b212378ba94b703961607191fbd49",
+    "MessageId": "565bd4ac-239d-419f-8007-fe9ce13cc521"
 }
 
 
+- Executando o comando para receber a mensagem do SQS: 
 
+    - aws sqs receive-message: receber mensagem
+        parâmetros:
+        --queue-url:
+
+    aws sqs receive-message https://sqs.sa-east-1.amazonaws.com/488929950883/alura-test 
+    Output:  
+
+            {
+            "Messages": [
+                {
+                    "MessageId": "565bd4ac-239d-419f-8007-fe9ce13cc521",
+                    "ReceiptHandle": "AQEBzMWOJOOAAuNA52k5bt1zZR/Ig8Ymcjl4aOzzsP2S1U9X2TixYIUAIeiLaUUmMc6ujW1MWFwNScBHuwCwWFXKJCXmilc9Ue6gn0KIyf3lIFRwkHbGcKf2Zs68IL0XyWahSt/wTUOnhfMtil2mohLatA/qNE5FTqhx0BJ4NTeeUqCGdcV1EJPllQXyduijNgkmjv3oCdxUsknG34e6gPtYOC/dshRZSKoeuZBKuadNBqYg0Hlxcc+m4xodQ3WjyRli3uRUTNQo0U/sRu7ZG/v+5Q7FvYQwMIknyPnWZUc/62AzZZWvKNIkmjQ0xgBRLFKETqBkNrLFL0NmEEv0/olHAe7+nqrEHWUaTdIAejEmspxvZw8z4B8M8Od0QdIvc/1+IluAwdt/Re1xqxclGHLOwA==",
+                    "MD5OfBody": "422b212378ba94b703961607191fbd49",
+                    "Body": "Olá, mundo"
+                }
+            ]
+        }
+
+- Pegar o URL da fila e deletar essa fila:
+    1) aws sqs delete-queue help
+    2) aws sqs list-queues
+
+        {
+            "QueueUrls": [
+                "https://sqs.sa-east-1.amazonaws.com/488929950883/alura-test"
+            ]
+        }
+
+    3) aws sqs delete-queue --queue-url https://sqs.sa-east-1.amazonaws.com/488929950883/alura-test
+
+- Criar nova fila de mensagem:
+    1) aws sqs create-queue help
+    2) aws sqs create-queue --queue-name sqs-teste-lab
+    3) aws sqs list-queues 
+
+- Processamento de mensagens:
+  - Excluir mensagens já processadas
+  - aws sqs receive-message --queue-url https://sqs.sa-east-1.amazonaws.com/488929950883/sqs-teste-lab
+
+
+        {
+            "Messages": [
+                {
+                    "MessageId": "68b07c81-9353-4a85-8e68-b032e5a3da9c",
+                    "ReceiptHandle": "AQEBiRlOmL0SARk6UNiagJRbmfo7bPGWt8/uR3serpMKHfVhOyRNEmQaBR8iUsLaVZDYmDt5TgRAhjL+IumzVzYpHl/OK1AJ6SQbjFdcqS0u2zPG+Ub80CXlHUZBQTj8DLAvodfV0g0x7V21vKf7GsWLwOJ2eZbNzLW4gzm5ihx6PjvPdBpGxXVw5/BSdclSPfkMND7hhZQK5uCINYW75MbhNguq+Nz9IvXspcmg73/gi9BmNGNQkhokYX5bKFx1ku3KWWyDrsxVr846iM8UdleQGsG9MTaQwYviCrs9dciiH/GZlX2vRPS0ltppYDd2n3VhDVzSUWw1OCwfdx2D/M92mq88sWd9O5m/mErt3dIFGJrlzPetk69riN2cdRN0dzcNOtYkp5b4NlU77bi0i8mXqw==",
+                    "MD5OfBody": "422b212378ba94b703961607191fbd49",
+                    "Body": "Olá, mundo"
+                }
+            ]
+        }
+        
+  - O que é o "ReceiptHandle"? é o controle de recebimento da mensagem
