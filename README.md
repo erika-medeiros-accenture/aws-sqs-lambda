@@ -88,4 +88,21 @@
             ]
         }
 
-  - O que é o "ReceiptHandle"? é o controle de recebimento da mensagem
+  - O que é o "ReceiptHandle"? é o controle de recibo da mensagem
+  - Deletando mensagens já processadas:
+  
+            aws sqs delete-message --receipt-handle <ReceiptHandle> --queue-url https://sqs.sa-east-1.amazonaws.com/488929950883/sqs-teste-lab
+  
+- Ajustando o visibility timeout:
+    a) Visibility timeout é o período em que uma mensagem recebida de uma fila não ficará visível para outros consumidores de mensagens. Tempo limite de visibilidade deve ser o tempo máximo pra processar  e deletar a mensagem.
+        Conta de um visibility timeout: recebimento + processamento + exclusão
+        -> tornar a aplicação resiliente
+
+- Como economizar evitando requisições desnecessárias?
+  - Short Polling: N requisições até receber uma nova mensagem (isso gera custos, o SQS $0.40 a cada 1 milhão de requisi)
+  - Long Polling: Cria uma conexão até encontrar uma mensagem nova ou até atingir o tempo limite dessa conexão
+
+
+     --wait-time-seconds (integer): The duration (in seconds) for which the call waits for a message to arrive in the queue before returning. If a message is available, the call returns sooner than WaitTimeSeconds . If no messages are available  and  the wait time expires, the call returns successfully with an empty list of messages.
+
+        aws sqs receive-message --queue-url https://sqs.sa-east-1.amazonaws.com/488929950883/sqs-teste-lab --wait-time-seconds 20
