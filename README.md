@@ -106,3 +106,27 @@
      --wait-time-seconds (integer): The duration (in seconds) for which the call waits for a message to arrive in the queue before returning. If a message is available, the call returns sooner than WaitTimeSeconds . If no messages are available  and  the wait time expires, the call returns successfully with an empty list of messages.
 
         aws sqs receive-message --queue-url https://sqs.sa-east-1.amazonaws.com/488929950883/sqs-teste-lab --wait-time-seconds 20
+
+        Obs: é recomendável sempre usar o long polling nas suas aplicações. Ao passar o wait time seconds de 20 dá pra economizar 19 chamadas, pensando que sem passar isso serão 20 chamadas, sendo 1 por segundo, logo, se não chegar mensagens a cada segundo, então haverá chamadas de API desnecessárias.
+
+- Tratar erros e evitar o poison messages:
+  O que o SQS deve fazer com mensagens que não foram processadas?
+   
+   - Dead Letter Queues (fila de mensagens mortas) - DLQ`s: destino de uma fila, caso a mensagem possa ser envenenada, possa ser uma mensagem que contenha veneno, aquela mensagem que não consegue ser processada. Ex.: uma aplicação espera receber JSON e recebe XML
+   
+   - O SQS mantém um controle de quantas vezes a mensagem chega na fila de origem, tem um contador que pode ser usado como parâmetro para mandar as mensagens para DQL. 
+  
+    A mensagem chegou na sqs de origem, a aplicação tentou consumir essa mensagem, é xml, não consegue, lança o erro, e o contador dessa mensagem era 1. A mensagem vai voltar para a fila, o sqs vai disponibilizar essa mensagem depois que o visibility timeout foi respeitado e a aplicação, toda inocente, sem saber o conteúdo da mensagem vai tentar consumir essa mensagem de novo, e vai ver que é xml de novo e não consegue processar.  aplicação vai lançar outro erro. A aplicação na maior boa vontade dela, inocentemente, mais uma vez busca a mesma mensagem do sqs, e dessa vez ela falha de novo, porque é uma mensagem xml que ela não sabe processar, mas o contador agora era 3, atinge o limite máximo e a mensagem é encaminhada para DLQ configurada.
+
+  - Configurar DLQ: A criação de uma fila DLQ para cada fila regular. Após o número máximo de tentativas de processamento de uma mensagem ser esgotado, a mensagem deve ser direcionada para a DLQ. As filas DLQ devem possuir consumidores que alertam o time responsável quando novas mensagens forem detectadas.
+
+    ![DLQ](Screen%20Shot%202022-03-13%20at%2020.44.30.png)
+
+- Ordem de mensagens: 
+    - Filas FIFO (First-in-first-out delivery): na sqs FIFO temos a garantia que essas mensagens vão ser entregues na ordem que elas foram publicadas e que não haverá duplicidade dos dados  (se a mensagem chegar dentro de 5 minutos) ->  quando a ordem das operações e dos eventos é essencial ou quando duplicatas não podem ser toleradas. O nome de uma fila FIFO deve terminar com o sufixo .fifo
+
+- Enviar a mesma mensagem para diferentes filas:
+  Uso de tópico para transmitir uma mensagem para várias filas. O tópico (SNS - Simple Notification Service) é responsável por notificar as filas que uma nova mensagem existe e não só notificar, mas também enviar mensagens. Quando uma mensagem chegar no SNS é possível inscrever vários endpoints, por exemplo, uma fila, SMS, endpoint http, outro. O SNS resolve o problema de paralelismo, ou seja, não vai ter uma fila tentando pegar mensagem de outra, é tudo independente e paralelizado. É usado em casos de replicar a mensagem.
+
+
+
